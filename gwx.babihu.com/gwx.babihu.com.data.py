@@ -16,9 +16,10 @@ def analyst(url):
     )
     d = pq(res.text)
     title = d("div.h_bar h2").text()
-    infos = d("div#msg_con p span a").text().split("·")
+    infos = d("div#msg_con p span").text().split(
+        "┋")[0].split(":")[-1].strip().split("·")
     dynasty = infos[0]
-    author = infos[1]
+    author = infos[-1]
     count = 0
     lines = []
     for p in d("div#msg_con p").items():
@@ -34,13 +35,17 @@ def analyst(url):
 
 def main():
     for url in sys.stdin:
-        title, dynasty, autor, content = analyst(url)
         print("=====================================")
         print(url[:-1])
-        print(title)
-        print(dynasty)
-        print(autor)
-        print(content)
+        try:
+            title, dynasty, autor, content = analyst(url)
+            print(title)
+            print(dynasty)
+            print(autor)
+            print(content)
+        except Exception as e:
+            print("xxxxxxxxxxxxxx")
+            print(e)
 
 
 if __name__ == "__main__":
