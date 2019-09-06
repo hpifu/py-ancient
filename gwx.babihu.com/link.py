@@ -8,19 +8,26 @@ www = "http://gwx.babihu.com"
 
 
 def extractLink(url):
-    res = requests.get(
-        url,
-        headers={
-            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
-            "accept-language": "zh-CN,zh;q=0.9,en;q=0.8",
-            "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36",
-        }
-    )
-    d = pq(res.text)
-    pairs = []
-    for a in d("a").items():
-        pairs.append((a.text(), a.attr("href")))
-    return pairs
+    count = 0
+    while True:
+        try:
+            res = requests.get(
+                url,
+                headers={
+                    "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
+                    "accept-language": "zh-CN,zh;q=0.9,en;q=0.8",
+                    "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36",
+                }
+            )
+            d = pq(res.text)
+            pairs = []
+            for a in d("a").items():
+                pairs.append((a.text(), a.attr("href")))
+            return pairs
+        except Exception as e:
+            count += 1
+            if count == 3:
+                return []
 
 
 def travel(filename="stdout"):
