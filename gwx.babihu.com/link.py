@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import requests
+import sys
 from pyquery import PyQuery as pq
 
 www = "http://gwx.babihu.com"
@@ -22,10 +23,13 @@ def extractLink(url):
     return pairs
 
 
-def travel():
+def travel(filename="stdout"):
     hrefs = [www]
     hrefset = set(hrefs)
-    fp = open("gwx.babihu.com.txt.1", "w")
+    if filename == "stdout":
+        fp = sys.stdout
+    else:
+        fp = open(filename, "w")
     while hrefs:
         url = hrefs[-1]
         for pair in extractLink(url):
@@ -33,12 +37,10 @@ def travel():
             if href in hrefset:
                 continue
             hrefset.add(href)
-            if href.startswith("/dynasty"):
-                hrefs.append(www+href)
-            if href.startswith("/author"):
-                hrefs.append(www+href)
             if href.startswith("/article/view"):
                 fp.write("{}\t{}\t{}\n".format(text, www+href, url))
+            elif href.startswith("/"):
+                hrefs.append(www+href)
         hrefs.pop()
         fp.flush()
     fp.close()
