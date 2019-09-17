@@ -2,50 +2,87 @@
 
 import sys
 import requests
+import json
+import argparse
 from pyquery import PyQuery as pq
 
 
 def analyst(url):
-    res = requests.get(
-        url,
-        headers={
-            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
-            "accept-language": "zh-CN,zh;q=0.9,en;q=0.8",
-            "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36",
-        }
-    )
-    d = pq(res.text)
-    title = d("div.h_bar h2").text()
-    infos = d("div#msg_con p span").text().split(
-        "┋")[0].split(":")[-1].strip().split("·")
-    dynasty = infos[0]
-    author = infos[-1]
     count = 0
-    lines = []
-    for p in d("div#msg_con p").items():
-        count += 1
-        if count == 1:
+    while True:
+        try:
+            res = requests.get(
+                url,
+                headers={
+                    "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3",
+                    "accept-language": "zh-CN,zh;q=0.9,en;q=0.8",
+                    "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36",
+                }
+            )
+            d = pq(res.text)
+            title = d("div.h_bar h2").text()
+            infos = d("div#msg_con p span").text().split(
+                "┋")[0].split(":")[-1].strip().split("·")
+            dynasty = infos[0]
+            author = infos[-1]
+            count = 0
+            lines = []
+            for p in d("div#msg_con p").items():
+                count += 1
+                if count == 1:
+                    continue
+                if p.attr("class") == "pay_bg":
+                    break
+                lines.append(p.text())
+            content = "\n".join(lines)
+            return (title, dynasty, author, content)
+        except Exception as e:
+            count += 1
+            if count == 3:
+                return None
+
+
+def serialize(input="stdin", output="stdout", limit=0):
+    if input == "stdin":
+        ifp = sys.stdin
+    else:
+        ifp = open(input)
+    if output == "stdout":
+        ofp = sys.stdout
+    else:
+        ofp = open(output, "w")
+    count = 0
+    for url in ifp:
+        infos = analyst(url)
+        if not infos:
             continue
-        if p.attr("class") == "pay_bg":
-            break
-        lines.append(p.text())
-    content = "\n".join(lines)
-    return (title, dynasty, author, content)
+        title, dynasty, author, content = infos
+        ofp.write("{}\n".format(json.dumps({
+            "url": url,
+            "title": title,
+            "dynasty": dynasty,
+            "author": author,
+            "content": content,
+        })))
+        ofp.flush()
+    ofp.close()
 
 
 def main():
-    for url in sys.stdin:
-        print("=====================================")
-        print(url[:-1])
-        try:
-            title, dynasty, autor, content = analyst(url)
-            print(title)
-            print(dynasty)
-            print(autor)
-            print(content)
-        except Exception as e:
-            print("xxxxxxxxxxxxxx")
-            print(e)
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description="""Example:
+    python3 link.py --limit 1
+""",
+    )
+    parser.add_argument("-l", "--limit", default=0,
+                        type=int, help="limit links")
+    parser.add_argument("-o", "--output", default="stdout",
+                        help="output filename")
+    parser.add_argument("-i", "--input", default="stdin",
+                        help="input filename")
+    args = parser.parse_args()
+    serialize(args.input, args.output, args.limit)
 
 
 if __name__ == "__main__":
