@@ -65,6 +65,9 @@ def serialize(input="stdin", output="stdout", limit=0):
             "content": content,
         })))
         ofp.flush()
+        count += 1
+        if limit != 0 and count >= limit:
+            break
     ofp.close()
 
 
