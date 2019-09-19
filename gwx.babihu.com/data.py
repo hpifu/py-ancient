@@ -5,7 +5,11 @@ import requests
 import json
 import argparse
 from pyquery import PyQuery as pq
+import mmh3
 
+def murmur3_64(text):
+    val, _ = mmh3.hash64(text)
+    return val if val >= 0 else val + 2**64
 
 def analyst(url):
     count = 0
@@ -59,6 +63,7 @@ def serialize(input="stdin", output="stdout", limit=0):
         title, dynasty, author, content = infos
         ofp.write("{}\n".format(json.dumps({
             "url": url,
+            "id": murmur3_64("{}-{}-{}-{}".format(*infos)),
             "title": title,
             "dynasty": dynasty,
             "author": author,
