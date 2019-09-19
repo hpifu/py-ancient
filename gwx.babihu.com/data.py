@@ -4,6 +4,7 @@ import sys
 import requests
 import json
 import argparse
+import re
 from pyquery import PyQuery as pq
 import mmh3
 
@@ -63,9 +64,14 @@ def serialize(input="stdin", output="stdout", limit=0):
         if not infos:
             continue
         title, dynasty, author, content = infos
+        content = re.sub('[ \u00a0\u0020\u3000]+', ' ', content)
+        content = re.sub('[\n\r]+', '\n', content)
+        val = "".join([c for c in content if c not in set(
+            [c for c in " \t\n\r，、。；《》“”\"\"''"]
+        )])
         ofp.write("{}\n".format(json.dumps({
-            "url": url,
-            "id": murmur3_64("{}-{}-{}-{}".format(*infos)) % (2**63 - 1),
+            "url": url[:-1],
+            "id": murmur3_64(val) % (2**63 - 1),
             "title": title,
             "dynasty": dynasty,
             "author": author,
