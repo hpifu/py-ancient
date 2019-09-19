@@ -59,7 +59,7 @@ def travel(filename="stdout", limit=0):
     count = 0
     num = 0
     while queue:
-        url = queue[-1]
+        url = queue[0]
         for href in extractLink(url):
             if href in history:
                 continue
@@ -77,7 +77,7 @@ def travel(filename="stdout", limit=0):
         if num % 100 == 0:
             dump(queue, ".queue")
             dump(history, ".history")
-        queue.pop()
+        queue = queue[1:]
         fp.flush()
     fp.close()
     dump(queue, ".queue")
