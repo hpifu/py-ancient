@@ -71,7 +71,7 @@ def serialize(input="stdin", output="stdout", limit=0):
         )])
         ofp.write("{}\n".format(json.dumps({
             "url": url[:-1],
-            "id": murmur3_64(val) % (2**63 - 1),
+            "id": murmur3_64(val) % (2**53 - 1),  # javascript 最大整数位 2**53 - 1
             "title": title,
             "dynasty": dynasty,
             "author": author,
