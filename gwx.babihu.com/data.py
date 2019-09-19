@@ -7,9 +7,11 @@ import argparse
 from pyquery import PyQuery as pq
 import mmh3
 
+
 def murmur3_64(text):
     val, _ = mmh3.hash64(text)
     return val if val >= 0 else val + 2**64
+
 
 def analyst(url):
     count = 0
@@ -63,7 +65,7 @@ def serialize(input="stdin", output="stdout", limit=0):
         title, dynasty, author, content = infos
         ofp.write("{}\n".format(json.dumps({
             "url": url,
-            "id": murmur3_64("{}-{}-{}-{}".format(*infos)),
+            "id": murmur3_64("{}-{}-{}-{}".format(*infos)) % (2**63 - 1),
             "title": title,
             "dynasty": dynasty,
             "author": author,
@@ -80,9 +82,8 @@ def main():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description="""Example:
-    python3 link.py --limit 1
-""",
-    )
+    python3 data.py --limit 1
+""")
     parser.add_argument("-l", "--limit", default=0,
                         type=int, help="limit links")
     parser.add_argument("-o", "--output", default="stdout",
