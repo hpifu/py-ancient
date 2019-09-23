@@ -24,7 +24,7 @@ def insert(input="stdin", output="stdout"):
 
     for line in ifp:
         obj = json.loads(line[:-1])
-        res = es.index(index="hpifu", doc_type='ancient', id=obj["id"], body={
+        res = es.index(index="ancient", doc_type='ancient', id=obj["id"], body={
             "id": obj["id"],
             "title": obj["title"],
             "dynasty": obj["dynasty"],
