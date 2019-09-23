@@ -32,7 +32,7 @@ def insert(output="stdout"):
     else:
         ofp = open(output, "w")
 
-    limit = 100
+    limit = 1000
     offset = 0
     with conn.cursor() as cursor:
         while True:
