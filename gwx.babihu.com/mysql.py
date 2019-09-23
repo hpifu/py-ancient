@@ -26,11 +26,15 @@ conn = pymysql.connect(
 )
 
 
-def insert(input="stdin"):
+def insert(input="stdin", output="stdout"):
     if input == "stdin":
         ifp = sys.stdin
     else:
         ifp = open(input)
+    if output == "stdout":
+        ofp = sys.stdout
+    else:
+        ofp = open(output, "w")
 
     for line in ifp:
         obj = json.loads(line[:-1])
@@ -41,6 +45,7 @@ def insert(input="stdin"):
             ON DUPLICATE KEY UPDATE id=id
             """.format(**obj))
         conn.commit()
+        ofp.write(line)
 
 
 def main():
