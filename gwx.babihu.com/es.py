@@ -1,29 +1,15 @@
 #!/usr/bin/env python3
 
 import argparse
-import pymysql
 import sys
 import json
+from elasticsearch import Elasticsearch
 
 config = {
-    "mysqldb": {
-        "host": "127.0.0.1",
-        "port": 3306,
-        "user": "hatlonely",
-        "password": "keaiduo1",
-        "db": "hads"
-    },
+    "host": "127.0.0.1:9200",
 }
 
-conn = pymysql.connect(
-    host=config["mysqldb"]["host"],
-    user=config["mysqldb"]["user"],
-    port=config["mysqldb"]["port"],
-    password=config["mysqldb"]["password"],
-    db=config["mysqldb"]["db"],
-    charset="utf8",
-    cursorclass=pymysql.cursors.DictCursor
-)
+es = Elasticsearch([config["host"]])
 
 
 def insert(input="stdin", output="stdout"):
@@ -38,13 +24,13 @@ def insert(input="stdin", output="stdout"):
 
     for line in ifp:
         obj = json.loads(line[:-1])
-        with conn.cursor() as cursor:
-            cursor.execute("""
-            INSERT INTO ancients (id, title, author, dynasty, content)
-            VALUES ({id}, '{title}', '{author}', '{dynasty}', '{content}')
-            ON DUPLICATE KEY UPDATE id=id
-            """.format(**obj))
-        conn.commit()
+        res = es.index(index="hpifu", doc_type='ancient', id=obj["id"], body={
+            "id": obj["id"],
+            "title": obj["title"],
+            "dynasty": obj["dynasty"],
+            "author": obj["author"],
+            "content": obj["content"],
+        })
         ofp.write(line)
 
 
