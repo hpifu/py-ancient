@@ -40,7 +40,7 @@ def main():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description="""Example:
-    python3 mysql.py
+    python3 es.py
 """)
     parser.add_argument("-i", "--input", default="stdin",
                         help="input filename")
