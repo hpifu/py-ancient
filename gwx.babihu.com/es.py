@@ -32,6 +32,8 @@ def insert(input="stdin", output="stdout"):
             "content": obj["content"],
         })
         ofp.write(line)
+        ofp.flush()
+    ofp.close()
 
 
 def main():

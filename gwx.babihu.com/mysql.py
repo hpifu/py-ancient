@@ -46,6 +46,8 @@ def insert(input="stdin", output="stdout"):
             """.format(**obj))
         conn.commit()
         ofp.write(line)
+        ofp.flush()
+    ofp.close()
 
 
 def main():
