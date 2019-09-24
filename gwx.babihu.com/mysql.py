@@ -61,7 +61,7 @@ def main():
     parser.add_argument("-o", "--output", default="stdout",
                         help="output filename")
     args = parser.parse_args()
-    insert(args.input)
+    insert(args.input, args.output)
 
 
 if __name__ == "__main__":
