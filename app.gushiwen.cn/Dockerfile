@@ -9,7 +9,7 @@ RUN yum -y install https://centos7.iuscommunity.org/ius-release.rpm && \
     && yum -y clean all
 
 # App home
-RUN mkdir -p /app/conf
+RUN mkdir -p /app/
 WORKDIR /app
 ADD logging.conf /app/
 ADD authors.py /app/

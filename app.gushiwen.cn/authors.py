@@ -94,7 +94,7 @@ def run(fp):
                 run_flag = False
                 continue
             else:
-                logging.info('crawing page {0} new count {1}, exists cnt {2}'.format(page, cnt, exists_cnt))
+                logging.info('crawing {0} page {1} new count {2}, exists cnt {3}'.format(dynasty, page, cnt, exists_cnt))
                 rds_cli.sadd(crawed_set, page)
                 fp.flush()
                 page += 1
