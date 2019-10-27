@@ -11,8 +11,8 @@ RUN yum -y install https://centos7.iuscommunity.org/ius-release.rpm && \
 # App home
 RUN mkdir -p /app/conf
 WORKDIR /app
-ADD conf/logging.conf /app/conf/
-ADD ancient_request.py /app/
+ADD logging.conf /app/
+ADD authors.py /app/
 RUN pip3.6 install redis
 RUN pip3.6 install requests
-CMD ["python3.6","/app/ancient_request.py"]
+CMD ["python3.6","/app/authors.py"]
